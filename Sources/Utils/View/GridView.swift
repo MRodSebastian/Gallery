@@ -87,7 +87,7 @@ class GridView: UIView {
 
   private func makeTopView() -> UIView {
     let view = UIView()
-    view.backgroundColor = UIColor.white
+    view.backgroundColor = Config.TopView.backgroundColor
 
     return view
   }
@@ -130,7 +130,7 @@ class GridView: UIView {
     button.setTitleColor(UIColor.white, for: UIControl.State())
     button.setTitleColor(UIColor.lightGray, for: .disabled)
     button.titleLabel?.font = Config.Font.Text.regular.withSize(16)
-    button.setTitle("Gallery.Done".g_localize(fallback: "Done"), for: UIControl.State())
+    button.setTitle(NSLocalizedString("accept", comment: ""), for: UIControl.State())
     
     return button
   }
@@ -141,7 +141,7 @@ class GridView: UIView {
     layout.minimumLineSpacing = 2
 
     let view = UICollectionView(frame: .zero, collectionViewLayout: layout)
-    view.backgroundColor = UIColor.white
+    view.backgroundColor = Config.Grid.GalleryView.backgroundColor
 
     return view
   }

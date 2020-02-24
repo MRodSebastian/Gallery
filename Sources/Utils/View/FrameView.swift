@@ -1,8 +1,6 @@
 import UIKit
 
 class FrameView: UIView {
-
-  lazy var label: UILabel = self.makeLabel()
   lazy var gradientLayer: CAGradientLayer = self.makeGradientLayer()
 
   // MARK: - Initialization
@@ -23,9 +21,6 @@ class FrameView: UIView {
     layer.addSublayer(gradientLayer)
     layer.borderColor = Config.Grid.FrameView.borderColor.cgColor
     layer.borderWidth = 3
-
-    addSubview(label)
-    label.g_pinCenter()
   }
 
   // MARK: - Layout

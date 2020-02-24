@@ -3,7 +3,7 @@ import AVFoundation
 
 class CameraController: UIViewController {
 
-  var locationManager: LocationManager?
+  var locationManager: GalleryLocationManager?
   lazy var cameraMan: CameraMan = self.makeCameraMan()
   lazy var cameraView: CameraView = self.makeCameraView()
   let once = Once()
@@ -69,7 +69,7 @@ class CameraController: UIViewController {
 
   func setupLocation() {
     if Config.Camera.recordLocation {
-      locationManager = LocationManager()
+      locationManager = GalleryLocationManager()
     }
   }
 

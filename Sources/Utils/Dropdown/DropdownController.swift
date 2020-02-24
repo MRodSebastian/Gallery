@@ -8,7 +8,6 @@ protocol DropdownControllerDelegate: class {
 class DropdownController: UIViewController {
 
   lazy var tableView: UITableView = self.makeTableView()
-  lazy var blurView: UIVisualEffectView = self.makeBlurView()
 
   var animating: Bool = false
   var expanding: Bool = false
@@ -38,9 +37,7 @@ class DropdownController: UIViewController {
   // MARK: - Setup
 
   func setup() {
-    view.backgroundColor = UIColor.clear
-    tableView.backgroundColor = UIColor.clear
-    tableView.backgroundView = blurView
+    tableView.backgroundColor = Config.Grid.GalleryView.backgroundColor
     
     view.addSubview(tableView)
     tableView.register(AlbumCell.self, forCellReuseIdentifier: String(describing: AlbumCell.self))
@@ -75,7 +72,7 @@ class DropdownController: UIViewController {
 
   func makeTableView() -> UITableView {
     let tableView = UITableView()
-    tableView.tableFooterView = UIView()
+    tableView.tableFooterView = UIView(frame: CGRect(x: 0, y: 0, width: tableView.frame.size.width, height: 80))
     tableView.separatorStyle = .none
     tableView.rowHeight = 84
 

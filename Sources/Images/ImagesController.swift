@@ -36,7 +36,7 @@ class ImagesController: UIViewController {
   // MARK: - Setup
 
   func setup() {
-    view.backgroundColor = UIColor.white
+    view.backgroundColor = Config.Grid.GalleryView.backgroundColor
 
     view.addSubview(gridView)
 
@@ -245,7 +245,6 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
 
     if let index = cart.images.firstIndex(of: item) {
       cell.frameView.g_quickFade()
-      cell.frameView.label.text = "\(index + 1)"
     } else {
       cell.frameView.alpha = 0
     }

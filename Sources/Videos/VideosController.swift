@@ -35,7 +35,7 @@ class VideosController: UIViewController {
   // MARK: - Setup
 
   func setup() {
-    view.backgroundColor = UIColor.white
+    view.backgroundColor = Config.Grid.GalleryView.backgroundColor
 
     view.addSubview(gridView)
 
@@ -60,7 +60,7 @@ class VideosController: UIViewController {
     gridView.collectionView.delegate = self
     gridView.collectionView.register(VideoCell.self, forCellWithReuseIdentifier: String(describing: VideoCell.self))
 
-    gridView.arrowButton.updateText("Gallery.AllVideos".g_localize(fallback: "ALL VIDEOS"))
+    gridView.arrowButton.updateText(NSLocalizedString("videos", comment: ""))
     gridView.arrowButton.arrow.isHidden = true
   }
 
@@ -88,7 +88,7 @@ class VideosController: UIViewController {
     gridView.collectionView.g_updateBottomInset(hasVideo ? gridView.bottomView.frame.size.height : 0)
 
     cart.video?.fetchDuration { [weak self] duration in
-      self?.infoLabel.isHidden = duration <= Config.VideoEditor.maximumDuration
+      self?.infoLabel.isHidden = Config.VideoEditor.maximumDuration == 0 ? true : duration <= Config.VideoEditor.maximumDuration
     }
   }
 
@@ -112,9 +112,7 @@ class VideosController: UIViewController {
     let label = UILabel()
     label.textColor = UIColor.white
     label.font = Config.Font.Text.regular.withSize(12)
-    label.text = String(format: "Gallery.Videos.MaxiumDuration".g_localize(fallback: "FIRST %d SECONDS"),
-                        (Int(Config.VideoEditor.maximumDuration)))
-
+    label.text = String(format: NSLocalizedString("Gallery.Videos.MaxiumDuration", comment: ""), (Int(Config.VideoEditor.maximumDuration)))
     return label
   }
 }
@@ -167,7 +165,6 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
     let item = items[(indexPath as NSIndexPath).item]
 
     cell.configure(item)
-    cell.frameView.label.isHidden = true
     configureFrameView(cell, indexPath: indexPath)
 
     return cell
