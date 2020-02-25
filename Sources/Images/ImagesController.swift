@@ -221,15 +221,21 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
 
-    if cart.images.contains(item) {
-      cart.remove(item)
-    } else {
-      if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
+    if Config.Camera.imageLimit == 1 {
+        cart.images.removeAll()
         cart.add(item)
-      }
-    }
+        EventHub.shared.doneWithImages?()
+    }else{
+        if cart.images.contains(item) {
+          cart.remove(item)
+        } else {
+          if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
+            cart.add(item)
+          }
+        }
 
-    configureFrameViews()
+        configureFrameViews()
+    }
   }
 
   func configureFrameViews() {
