@@ -26,21 +26,25 @@ public class Video: Equatable {
       }
       return
     }
-
-    if durationRequestID != 0 {
-      PHImageManager.default().cancelImageRequest(PHImageRequestID(durationRequestID))
-    }
-
-    let id = PHImageManager.default().requestAVAsset(forVideo: asset, options: videoOptions) {
-      asset, mix, _ in
-
-      self.duration = asset?.duration.seconds ?? 0
-      DispatchQueue.main.async {
+    
+    DispatchQueue.main.async {
         completion(self.duration)
-      }
     }
 
-    durationRequestID = Int(id)
+//    if durationRequestID != 0 {
+//      PHImageManager.default().cancelImageRequest(PHImageRequestID(durationRequestID))
+//    }
+//
+//    let id = PHImageManager.default().requestAVAsset(forVideo: asset, options: videoOptions) {
+//      asset, mix, _ in
+//
+//      self.duration = asset?.duration.seconds ?? 0
+//      DispatchQueue.main.async {
+//        completion(self.duration)
+//      }
+//    }
+//
+//    durationRequestID = Int(id)
   }
 
   /// Fetch AVPlayerItem asynchronoulys
