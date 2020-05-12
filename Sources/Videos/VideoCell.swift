@@ -11,11 +11,11 @@ class VideoCell: ImageCell {
 
   func configure(_ video: Video) {
     super.configure(video.asset)
-//    video.fetchDuration { duration in
-//      DispatchQueue.main.async {
-//        self.durationLabel.text = "\(Utils.format(duration))"
-//      }
-//    }
+    video.fetchDuration { duration in
+      DispatchQueue.main.async {
+        self.durationLabel.text = "\(Utils.format(duration))"
+      }
+    }
   }
 
   // MARK: - Setup
@@ -36,6 +36,8 @@ class VideoCell: ImageCell {
 
     durationLabel.g_pin(on: .right, constant: -4)
     durationLabel.g_pin(on: .bottom, constant: -2)
+    
+    durationLabel.alpha = 0
   }
 
   // MARK: - Controls
