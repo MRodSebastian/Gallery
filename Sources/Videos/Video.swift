@@ -3,105 +3,103 @@ import Photos
 
 /// Wrap a PHAsset for video
 public class Video: Equatable {
-
-  public let asset: PHAsset
-
-  var durationRequestID: Int = 0
-  var duration: Double = 0
-
-  // MARK: - Initialization
-
-  init(asset: PHAsset) {
-    self.asset = asset
-  }
-
-  /// Fetch video duration asynchronously
-  ///
-  /// - Parameter completion: Called when finish
-  func fetchDuration(_ completion: @escaping (Double) -> Void) {
-    guard duration == 0
-    else {
-      DispatchQueue.main.async {
-        completion(self.duration)
-      }
-      return
+    
+    public let asset: PHAsset
+    
+    var durationRequestID: Int = 0
+    var duration: Double = 0
+    
+    // MARK: - Initialization
+    
+    init(asset: PHAsset) {
+        self.asset = asset
     }
     
-    DispatchQueue.main.async {
-        completion(self.duration)
-    }
-
-//    if durationRequestID != 0 {
-//      PHImageManager.default().cancelImageRequest(PHImageRequestID(durationRequestID))
-//    }
-//
-//    let id = PHImageManager.default().requestAVAsset(forVideo: asset, options: videoOptions) {
-//      asset, mix, _ in
-//
-//      self.duration = asset?.duration.seconds ?? 0
-//      DispatchQueue.main.async {
-//        completion(self.duration)
-//      }
-//    }
-//
-//    durationRequestID = Int(id)
-  }
-
-  /// Fetch AVPlayerItem asynchronoulys
-  ///
-  /// - Parameter completion: Called when finish
-  public func fetchPlayerItem(_ completion: @escaping (AVPlayerItem?) -> Void) {
-    PHImageManager.default().requestPlayerItem(forVideo: asset, options: videoOptions) {
-      item, _ in
-
-      DispatchQueue.main.async {
-        completion(item)
-      }
-    }
-  }
-
-  /// Fetch AVAsset asynchronoulys
-  ///
-  /// - Parameter completion: Called when finish
-  public func fetchAVAsset(_ completion: @escaping (AVAsset?) -> Void) {
-    PHImageManager.default().requestAVAsset(forVideo: asset, options: videoOptions) { avAsset, _, _ in
-      DispatchQueue.main.async {
-        completion(avAsset)
-      }
-    }
-  }
-
-  /// Fetch thumbnail image for this video asynchronoulys
-  ///
-  /// - Parameter size: The preferred size
-  /// - Parameter completion: Called when finish
-  public func fetchThumbnail(size: CGSize = CGSize(width: 100, height: 100), completion: @escaping (UIImage?) -> Void) {
-    let options = PHImageRequestOptions()
-    options.isNetworkAccessAllowed = true
-
-    PHImageManager.default().requestImage(
-      for: asset,
-      targetSize: size,
-      contentMode: .aspectFill,
-      options: options) { image, _ in
+    /// Fetch video duration asynchronously
+    ///
+    /// - Parameter completion: Called when finish
+    func fetchDuration(_ completion: @escaping (Double) -> Void) {
+        guard duration == 0
+            else {
+                DispatchQueue.main.async {
+                    completion(self.duration)
+                }
+                return
+        }
+        
         DispatchQueue.main.async {
-          completion(image)
+            if (self.asset.duration != 0.0){
+                self.duration = self.asset.duration
+                completion(self.duration)
+            }else{
+                completion(self.duration)
+            }
         }
     }
-  }
-
-  // MARK: - Helper
-
-  private var videoOptions: PHVideoRequestOptions {
-    let options = PHVideoRequestOptions()
-    options.isNetworkAccessAllowed = true
-
-    return options
-  }
+    
+    /// Fetch AVPlayerItem asynchronoulys
+    ///
+    /// - Parameter completion: Called when finish
+    public func fetchPlayerItem(_ completion: @escaping (AVPlayerItem?) -> Void) {
+        PHImageManager.default().requestPlayerItem(forVideo: asset, options: videoOptions) {
+            item, _ in
+            
+            DispatchQueue.main.async {
+                completion(item)
+            }
+        }
+    }
+    
+    /// Fetch AVAsset asynchronoulys
+    ///
+    /// - Parameter completion: Called when finish
+    public func fetchAVAsset(_ completion: @escaping (AVAsset?) -> Void, progressCallback :(() -> Void)? = nil) {
+        
+//        videoOptions.progressHandler = {progress, error, _, _ in
+//            progressCallback?(progress, error)
+//        }
+                
+        PHImageManager.default().requestAVAsset(forVideo: asset, options: videoOptions) { avAsset, _, _ in
+            DispatchQueue.main.async {
+                completion(avAsset)
+            }
+        }
+    }
+    
+    /// Fetch thumbnail image for this video asynchronoulys
+    ///
+    /// - Parameter size: The preferred size
+    /// - Parameter completion: Called when finish
+    public func fetchThumbnail(size: CGSize = CGSize(width: 100, height: 100), completion: @escaping (UIImage?) -> Void) {
+        let options = PHImageRequestOptions()
+        options.isNetworkAccessAllowed = true
+        
+        PHImageManager.default().requestImage(
+            for: asset,
+            targetSize: size,
+            contentMode: .aspectFill,
+            options: options) { image, _ in
+                DispatchQueue.main.async {
+                    completion(image)
+                }
+        }
+    }
+    
+    // MARK: - Helper
+    
+    private var progressHandler :PHAssetVideoProgressHandler?
+    
+    private var videoOptions: PHVideoRequestOptions {
+        let options = PHVideoRequestOptions()
+        options.isNetworkAccessAllowed = true
+        options.progressHandler = progressHandler
+        
+        return options
+    }
 }
 
 // MARK: - Equatable
 
 public func ==(lhs: Video, rhs: Video) -> Bool {
-  return lhs.asset == rhs.asset
+    return lhs.asset == rhs.asset
 }

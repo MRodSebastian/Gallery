@@ -35,9 +35,7 @@ class VideoCell: ImageCell {
     cameraImageView.g_pin(size: CGSize(width: 12, height: 6))
 
     durationLabel.g_pin(on: .right, constant: -4)
-    durationLabel.g_pin(on: .bottom, constant: -2)
-    
-    durationLabel.alpha = 0
+    durationLabel.g_pin(on: .bottom, constant: -2)    
   }
 
   // MARK: - Controls
