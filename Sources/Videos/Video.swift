@@ -53,13 +53,14 @@ public class Video: Equatable {
     /// Fetch AVAsset asynchronoulys
     ///
     /// - Parameter completion: Called when finish
-    public func fetchAVAsset(_ completion: @escaping (AVAsset?) -> Void, progressCallback :(() -> Void)? = nil) {
+    public func fetchAVAsset(_ completion: @escaping (AVAsset?) -> Void, progressCallback :((Double, Error?) -> Void)? = nil) {
         
-//        videoOptions.progressHandler = {progress, error, _, _ in
-//            progressCallback?(progress, error)
-//        }
-                
-        PHImageManager.default().requestAVAsset(forVideo: asset, options: videoOptions) { avAsset, _, _ in
+        var options = videoOptions
+        options.progressHandler = {progress, error, _, _ in
+            progressCallback?(progress, error)
+        }
+        
+        PHImageManager.default().requestAVAsset(forVideo: asset, options: options) { avAsset, _, _ in
             DispatchQueue.main.async {
                 completion(avAsset)
             }
@@ -86,13 +87,9 @@ public class Video: Equatable {
     }
     
     // MARK: - Helper
-    
-    private var progressHandler :PHAssetVideoProgressHandler?
-    
     private var videoOptions: PHVideoRequestOptions {
         let options = PHVideoRequestOptions()
         options.isNetworkAccessAllowed = true
-        options.progressHandler = progressHandler
         
         return options
     }
