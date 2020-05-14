@@ -57,7 +57,9 @@ public class Video: Equatable {
         
         var options = videoOptions
         options.progressHandler = {progress, error, _, _ in
-            progressCallback?(progress, error)
+            DispatchQueue.main.async {
+                progressCallback?(progress, error)
+            }
         }
         
         PHImageManager.default().requestAVAsset(forVideo: asset, options: options) { avAsset, _, _ in
