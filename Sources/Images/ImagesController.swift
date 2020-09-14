@@ -149,10 +149,35 @@ extension ImagesController: PageAware {
         if let album = self.library.albums.first {
           self.selectedAlbum = album
           self.show(album: album)
+        }else{
+            DispatchQueue.main.async {
+                let status = self.checkPermissions()
+                if(status == false){
+                    self.gridView.emptyView.isHidden = false
+                }else{
+                    self.gridView.emptyView.isHidden = true
+                }
+            }
         }
       }
     }
   }
+    
+    private func checkPermissions() -> Bool{
+        if #available(iOS 14, *) {
+            let permissionStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+            switch permissionStatus {
+            case .restricted, .denied, .limited, .notDetermined:
+                return false
+            case .authorized:
+                return true
+            default:
+                return true
+            }
+        } else {
+            return true
+        }
+    }
 }
 
 extension ImagesController: CartDelegate {

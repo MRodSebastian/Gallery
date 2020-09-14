@@ -54,20 +54,89 @@ public class Video: Equatable {
     ///
     /// - Parameter completion: Called when finish
     public func fetchAVAsset(_ completion: @escaping (AVAsset?) -> Void, progressCallback :((Double, Error?) -> Void)? = nil) {
+                
+        let imageManager = PHImageManager()
+        var avAsset: AVAsset?
         
-        var options = videoOptions
-        options.progressHandler = {progress, error, _, _ in
-            DispatchQueue.main.async {
-                progressCallback?(progress, error)
+        let options = videoOptions
+        
+        options.progressHandler = {(progress, error,_,_) in
+            
+            debugPrint(progress)
+            if let pCalback = progressCallback{
+                pCalback(progress ?? 0, error)
             }
         }
-        
-        PHImageManager.default().requestAVAsset(forVideo: asset, options: options) { avAsset, _, _ in
-            DispatchQueue.main.async {
-                completion(avAsset)
+      
+        // Now go fetch the AVAsset for the given PHAsset
+        imageManager.requestAVAsset(forVideo: asset, options: options) { (requestedAsset, _, _) in
+            
+            // We're done, let the semaphore know it can unlock now
+            let videoData :Data
+            if let avassetURL = requestedAsset as? AVURLAsset {
+                guard let video = try? Data(contentsOf: avassetURL.url) else {
+                    return
+                }
+                videoData = video
+                let URL = self.storeVideo(file: avassetURL.url, data: videoData)
+                
+                avAsset = AVAsset(url: URL!)
+                
+                debugPrint(avAsset!.duration)
+                debugPrint(avAsset!.description)
+                DispatchQueue.main.async {
+                    completion(avAsset)
+                }
             }
         }
+
     }
+    
+    func requestAVAsset(asset: PHAsset) -> AVAsset? {
+        // We only want videos here
+        guard asset.mediaType == .video else { return nil }
+        // Create your semaphore and allow only one thread to access it
+        let semaphore = DispatchSemaphore.init(value: 0)
+        let imageManager = PHImageManager()
+        var avAsset: AVAsset?
+      
+        // Now go fetch the AVAsset for the given PHAsset
+        imageManager.requestAVAsset(forVideo: asset, options: videoOptions) { (requestedAsset, _, _) in
+            
+            // We're done, let the semaphore know it can unlock now
+            let videoData :Data
+            if let avassetURL = requestedAsset as? AVURLAsset {
+                guard let video = try? Data(contentsOf: avassetURL.url) else {
+                    return
+                }
+                videoData = video
+                let URL = self.storeVideo(file: avassetURL.url, data: videoData)
+                
+                avAsset = AVAsset(url: URL!)
+                
+                debugPrint(avAsset!.duration)
+                debugPrint(avAsset!.description)
+            }
+            
+            semaphore.signal()
+        }
+        // Lock the thread with the wait() command
+        semaphore.wait()
+        return avAsset
+    }
+    
+    func storeVideo(file :URL, data:Data?) -> URL? {
+        if let videoData = data{
+            let fileName = ProcessInfo().globallyUniqueString
+            let fileExtension = file.pathExtension
+            let file = "\(fileName).\(fileExtension)"
+            let tmpDir = NSTemporaryDirectory()
+            let fileURL = URL(fileURLWithPath: tmpDir, isDirectory: true).appendingPathComponent(file)
+            try? videoData.write(to: fileURL)
+                return fileURL
+            }
+            return nil
+        }
     
     /// Fetch thumbnail image for this video asynchronoulys
     ///
