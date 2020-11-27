@@ -126,6 +126,9 @@ extension VideosController: PageAware {
         self.items = self.library.items
         self.gridView.collectionView.reloadData()
         self.gridView.emptyView.isHidden = !self.items.isEmpty
+        if(!self.items.isEmpty){
+            self.gridView.collectionView.scrollToItem(at: IndexPath(row: self.items.count-1, section: 0), at: .bottom, animated: false)
+        }
       }
     }
   }
